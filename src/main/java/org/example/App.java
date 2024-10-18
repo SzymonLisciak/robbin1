@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.tile.TileManager;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,14 +10,15 @@ public class App extends JPanel implements Runnable {
      final int originalTitleSize = 16;
     final int scale = 3;
     public final int titleSize = originalTitleSize * scale;
-    final int maxScreenCol = 16;
-    final int maxScreenRow = 12;
-    final int screenWidth = titleSize * maxScreenCol;
-    final int screenHeight = titleSize * maxScreenRow;
+    public final int maxScreenCol = 16;
+    public final int maxScreenRow = 12;
+    public final int screenWidth = titleSize * maxScreenCol;
+    public final int screenHeight = titleSize * maxScreenRow;
     KeyHandler keyH = new KeyHandler();
      Thread gameThread;
-    int playerX = 100, playerY = 100, playerSpeed = 4;
+
     int FPS = 60;
+    TileManager tileM = new TileManager(this);
 
     Player player = new Player(this,keyH);
 
@@ -99,8 +102,10 @@ public class App extends JPanel implements Runnable {
         super.paintComponent(g);
 
         Graphics2D g2 = (Graphics2D) g;
+        tileM.draw(g2);
 
         player.draw(g2);
+
         g2.dispose();
     }
 

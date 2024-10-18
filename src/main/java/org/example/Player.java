@@ -70,6 +70,7 @@ public class Player extends Entity {
                 image = right1;
                 break;
             case "up":
+
                 image = left1;
                 break;
         }
