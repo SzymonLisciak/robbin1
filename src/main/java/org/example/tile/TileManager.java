@@ -18,7 +18,7 @@ public class TileManager {
     public TileManager(App app) {
 
         this.app = app;
-        tiles = new Tiles[10];
+        tiles = new Tiles[11];
         mapTileNum = new int[app.maxWorldRow][app.maxWorldCol];
         getTileImage();
         loadMap();
@@ -58,7 +58,7 @@ public class TileManager {
 
 
     public void loadMap() {
-        try (InputStream is = getClass().getResourceAsStream("/maps/map01.txt");
+        try (InputStream is = getClass().getResourceAsStream("/maps/map03.txt");
              BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 
             int col = 0;
@@ -89,7 +89,10 @@ public class TileManager {
            int worldY = worldRow * app.tileSize;
            int screenX = worldX - app.player.worldX + app.player.screenX;
            int screenY = worldY - app.player.worldY + app.player.screenY;
-           g2.drawImage(tiles[tileNum].image, screenX, screenY, app.tileSize, app.tileSize,null);
+           if (worldX + app.tileSize > app.player.worldX - app.player.screenX && worldX - app.tileSize < app.player.worldX + app.player.screenX && worldY + app.tileSize > app.player.worldY - app.player.screenY && worldY - app.tileSize < app.player.worldY + app.player.screenY) {
+               g2.drawImage(tiles[tileNum].image, screenX, screenY, app.tileSize, app.tileSize,null);
+           }
+
            worldCol++;
 
 
