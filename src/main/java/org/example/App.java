@@ -7,20 +7,27 @@ import java.awt.*;
 
 public class App extends JPanel implements Runnable {
 
-     final int originalTitleSize = 16;
+     final int originalTileSize = 16;
     final int scale = 3;
-    public final int titleSize = originalTitleSize * scale;
+    public final int tileSize = originalTileSize * scale;
     public final int maxScreenCol = 16;
     public final int maxScreenRow = 12;
-    public final int screenWidth = titleSize * maxScreenCol;
-    public final int screenHeight = titleSize * maxScreenRow;
+    public final int screenWidth = tileSize * maxScreenCol;
+    public final int screenHeight = tileSize * maxScreenRow;
+    //USTAWIENIA MAPY
+    public final int maxWorldCol = 48;
+    public final int maxWorldRow = 32;
+    public final int WorldWidth = tileSize * maxWorldCol;
+    public final int WorldHeight = tileSize * maxWorldRow;
+
+
     KeyHandler keyH = new KeyHandler();
-     Thread gameThread;
+    Thread gameThread;
 
     int FPS = 60;
     TileManager tileM = new TileManager(this);
 
-    Player player = new Player(this,keyH);
+    public Player player = new Player(this,keyH);
 
     public App(){
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));

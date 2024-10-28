@@ -10,15 +10,20 @@ public class Player extends Entity {
     App app;
     KeyHandler keyH;
 
+    public final int screenX;
+    public final int screenY;
+
     public Player(App app, KeyHandler keyH) {
         this.app = app;
         this.keyH = keyH;
+        screenX = app.screenWidth/2 - (app.tileSize/2);
+        screenY = app.screenHeight/2 - (app.tileSize/2);
         setDefaultValues();
         getPlayerImage();
     }
     public void setDefaultValues(){
-        x = 100;
-        y = 100;
+        worldX = app.tileSize * 24;
+        worldY = app.tileSize * 18;
         speed = 4;
         direction = "left";
 
@@ -38,19 +43,19 @@ public class Player extends Entity {
     public void update(){
         if(keyH.upPressed == true){
             direction = "up";
-            y -= speed;
+            worldY -= speed;
         }
         else if(keyH.downPressed == true){
             direction = "down";
-            y += speed;
+            worldY += speed;
         }
         else if(keyH.leftPressed == true){
             direction = "left";
-            x -= speed;
+            worldX -= speed;
         }
         else if(keyH.rightPressed == true){
             direction = "right";
-            x += speed;
+            worldX += speed;
         }
     }
     public void draw(Graphics2D g2){
@@ -75,7 +80,7 @@ public class Player extends Entity {
                 break;
         }
 
-        g2.drawImage(image, x, y, app.titleSize, app.titleSize, null);
+        g2.drawImage(image, screenX, screenY, app.tileSize, app.tileSize, null);
 
 
     }

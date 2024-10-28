@@ -12,14 +12,14 @@ import java.io.InputStreamReader;
 public class TileManager {
     App app;
     Tiles[] tiles;
-    int mapTileNum[][];
+    int[][] mapTileNum;
 
 
     public TileManager(App app) {
 
         this.app = app;
         tiles = new Tiles[10];
-        mapTileNum = new int[app.maxScreenCol][app.maxScreenRow];
+        mapTileNum = new int[app.maxWorldRow][app.maxWorldCol];
         getTileImage();
         loadMap();
     }
@@ -33,6 +33,20 @@ public class TileManager {
             tiles[2].image = ImageIO.read(getClass().getResourceAsStream("/tiles/road_down.png"));
             tiles[3] = new Tiles();
             tiles[3].image = ImageIO.read(getClass().getResourceAsStream("/tiles/road_up.png"));
+            tiles[4] = new Tiles();
+            tiles[4].image = ImageIO.read(getClass().getResourceAsStream("/tiles/water.png"));
+            tiles[5] = new Tiles();
+            tiles[5].image = ImageIO.read(getClass().getResourceAsStream("/tiles/rock.png"));
+            tiles[6] = new Tiles();
+            tiles[6].image = ImageIO.read(getClass().getResourceAsStream("/tiles/glass.png"));
+            tiles[7] = new Tiles();
+            tiles[7].image = ImageIO.read(getClass().getResourceAsStream("/tiles/door_ld.png"));
+            tiles[8] = new Tiles();
+            tiles[8].image = ImageIO.read(getClass().getResourceAsStream("/tiles/door_rd.png"));
+            tiles[9] = new Tiles();
+            tiles[9].image = ImageIO.read(getClass().getResourceAsStream("/tiles/door_lu.png"));
+            tiles[10] = new Tiles();
+            tiles[10].image = ImageIO.read(getClass().getResourceAsStream("/tiles/door_ru.png"));
 
 
         }catch (IOException e){
@@ -43,50 +57,46 @@ public class TileManager {
     }
 
 
-    public void loadMap(){
-        try{
-            InputStream is = getClass().getResourceAsStream("/maps/map01.txt");
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            int col = 0 ;
+    public void loadMap() {
+        try (InputStream is = getClass().getResourceAsStream("/maps/map01.txt");
+             BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+
+            int col = 0;
             int row = 0;
-            while(col < app.maxScreenCol && row < app.maxScreenRow){
+
+            while (row < app.maxWorldRow) {
                 String line = br.readLine();
+                if (line == null) break;
 
-                while(col < app.maxScreenCol){
-                    String[] numbers = line.split(" ");
-
+                String[] numbers = line.split(" ");
+                for (col = 0; col < app.maxWorldRow; col++) {
                     int num = Integer.parseInt(numbers[col]);
                     mapTileNum[row][col] = num;
-                    col++;
                 }
-                if (col == app.maxScreenCol){
-                    col = 0;
-                    row++;
-                }
-                br.close();
+                row++;
             }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load map: " + e.getMessage(), e);
         }
     }
     public void draw(Graphics2D g2){
-       int col = 0;
-       int row = 0;
-       int y = 0;
-       int x = 0;
-       while(col < app.maxScreenCol && row < app.maxScreenRow){
-           int tileNum = mapTileNum[row][col];
-           g2.drawImage(tiles[tileNum].image, x, y, app.titleSize, app.titleSize,null);
-           col++;
-           x+=app.titleSize;
+       int worldCol = 0;
+       int worldRow = 0;
 
-           if(col == app.maxScreenCol){
+       while(worldCol < app.maxWorldCol && worldRow < app.maxWorldRow){
+           int tileNum = mapTileNum[worldRow][worldCol];
+           int worldX = worldCol * app.tileSize;
+           int worldY = worldRow * app.tileSize;
+           int screenX = worldX - app.player.worldX + app.player.screenX;
+           int screenY = worldY - app.player.worldY + app.player.screenY;
+           g2.drawImage(tiles[tileNum].image, screenX, screenY, app.tileSize, app.tileSize,null);
+           worldCol++;
 
-               col = 0;
-               x= 0;
-               row++;
-               y +=app.titleSize;
+
+           if(worldCol == app.maxWorldCol){
+               worldCol = 0;
+               worldRow++;
+
 
            }
 
