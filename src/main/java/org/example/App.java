@@ -15,15 +15,15 @@ public class App extends JPanel implements Runnable {
     public final int screenWidth = tileSize * maxScreenCol;
     public final int screenHeight = tileSize * maxScreenRow;
     //USTAWIENIA MAPY
-    public final int maxWorldCol = 50;
-    public final int maxWorldRow = 50;
+    public final int maxWorldCol = 66;
+    public final int maxWorldRow = 60;
     public final int WorldWidth = tileSize * maxWorldCol;
     public final int WorldHeight = tileSize * maxWorldRow;
 
 
     KeyHandler keyH = new KeyHandler();
     Thread gameThread;
-
+    CollisionChecker cChecker = new CollisionChecker(this);
     int FPS = 60;
     TileManager tileM = new TileManager(this);
 

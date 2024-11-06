@@ -18,6 +18,11 @@ public class Player extends Entity {
         this.keyH = keyH;
         screenX = app.screenWidth/2 - (app.tileSize/2);
         screenY = app.screenHeight/2 - (app.tileSize/2);
+        solidArea = new Rectangle();
+        solidArea.x =8;
+        solidArea.y =16;
+        solidArea.width =32;
+        solidArea.height =32;
         setDefaultValues();
         getPlayerImage();
     }
@@ -57,6 +62,8 @@ public class Player extends Entity {
             direction = "right";
             worldX += speed;
         }
+        collisionOn = false;
+        app.cChecker.checkTile(this);
     }
     public void draw(Graphics2D g2){
         //g2.setColor(Color.BLACK);
