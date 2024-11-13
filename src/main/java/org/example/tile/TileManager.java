@@ -11,8 +11,8 @@ import java.io.InputStreamReader;
 
 public class TileManager {
     App app;
-    Tiles[] tiles;
-    int[][] mapTileNum;
+    public Tiles[] tiles;
+    public int[][] mapTileNum;
 
 
     public TileManager(App app) {
@@ -72,7 +72,7 @@ public class TileManager {
                 if (line == null) break;
 
                 String[] numbers = line.split(" ");
-                for (col = 0; col < app.maxWorldRow; col++) {
+                for (col = 0; col < app.maxWorldCol; col++) {
                     int num = Integer.parseInt(numbers[col]);
                     mapTileNum[row][col] = num;
                 }

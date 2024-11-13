@@ -15,8 +15,8 @@ public class App extends JPanel implements Runnable {
     public final int screenWidth = tileSize * maxScreenCol;
     public final int screenHeight = tileSize * maxScreenRow;
     //USTAWIENIA MAPY
-    public final int maxWorldCol = 66;
-    public final int maxWorldRow = 60;
+    public final int maxWorldCol = 60;
+    public final int maxWorldRow = 66;
     public final int WorldWidth = tileSize * maxWorldCol;
     public final int WorldHeight = tileSize * maxWorldRow;
 

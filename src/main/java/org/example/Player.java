@@ -30,7 +30,7 @@ public class Player extends Entity {
         worldX = app.tileSize * 24;
         worldY = app.tileSize * 18;
         speed = 7;
-        direction = "left";
+        direction = "up";
 
     }
     public void getPlayerImage(){
@@ -46,24 +46,43 @@ public class Player extends Entity {
 
 
     public void update(){
+        if (keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true || keyH.rightPressed == true){
         if(keyH.upPressed == true){
             direction = "up";
-            worldY -= speed;
+
         }
         else if(keyH.downPressed == true){
             direction = "down";
-            worldY += speed;
+
         }
         else if(keyH.leftPressed == true){
             direction = "left";
-            worldX -= speed;
+
         }
         else if(keyH.rightPressed == true){
             direction = "right";
-            worldX += speed;
+
         }
         collisionOn = false;
         app.cChecker.checkTile(this);
+
+        if (collisionOn == false) {
+            switch (direction) {
+                case "left":
+                    worldX -= speed;
+                    break;
+                case "right":
+                    worldX += speed;
+                    break;
+                case "up":
+                    worldY -= speed;
+                    break;
+                case "down":
+                    worldY += speed;
+                    break;
+            }
+            }
+        }
     }
     public void draw(Graphics2D g2){
         //g2.setColor(Color.BLACK);
