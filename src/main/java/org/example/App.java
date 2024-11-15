@@ -28,6 +28,7 @@ public class App extends JPanel implements Runnable {
     TileManager tileM = new TileManager(this);
 
     public Player player = new Player(this,keyH);
+    public Cop cop1 = new Cop(this);
 
     public App(){
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));

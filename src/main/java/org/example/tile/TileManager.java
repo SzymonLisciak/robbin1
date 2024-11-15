@@ -18,7 +18,7 @@ public class TileManager {
     public TileManager(App app) {
 
         this.app = app;
-        tiles = new Tiles[11];
+        tiles = new Tiles[12];
         mapTileNum = new int[app.maxWorldRow][app.maxWorldCol];
         getTileImage();
         loadMap();
@@ -26,7 +26,7 @@ public class TileManager {
     public void getTileImage() {
         try {
             tiles[0] = new Tiles();
-            tiles[0].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grass.png"));
+            tiles[0].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grass1.png"));
             tiles[1] = new Tiles();
             tiles[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/wall.png"));
             tiles[1].collision = true;
@@ -39,17 +39,25 @@ public class TileManager {
             tiles[4].collision = true;
             tiles[5] = new Tiles();
             tiles[5].image = ImageIO.read(getClass().getResourceAsStream("/tiles/rock.png"));
+            tiles[5].collision = true;
             tiles[6] = new Tiles();
             tiles[6].image = ImageIO.read(getClass().getResourceAsStream("/tiles/glass.png"));
             tiles[6].collision = true;
             tiles[7] = new Tiles();
             tiles[7].image = ImageIO.read(getClass().getResourceAsStream("/tiles/door_ld.png"));
+            tiles[7].collision = true;
             tiles[8] = new Tiles();
             tiles[8].image = ImageIO.read(getClass().getResourceAsStream("/tiles/door_rd.png"));
+            tiles[8].collision = true;
             tiles[9] = new Tiles();
             tiles[9].image = ImageIO.read(getClass().getResourceAsStream("/tiles/door_lu.png"));
+            tiles[9].collision = true;
             tiles[10] = new Tiles();
             tiles[10].image = ImageIO.read(getClass().getResourceAsStream("/tiles/door_ru.png"));
+            tiles[10].collision = true;
+            tiles[11] = new Tiles();
+            tiles[11].image = ImageIO.read(getClass().getResourceAsStream("/tiles/tree.png"));
+            tiles[11].collision = true;
 
 
         }catch (IOException e){
@@ -61,7 +69,7 @@ public class TileManager {
 
 
     public void loadMap() {
-        try (InputStream is = getClass().getResourceAsStream("/maps/60x60.txt");
+        try (InputStream is = getClass().getResourceAsStream("/maps/60x66.txt");
              BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
 
             int col = 0;
@@ -83,30 +91,30 @@ public class TileManager {
         }
     }
     public void draw(Graphics2D g2){
-       int worldCol = 0;
-       int worldRow = 0;
+        int worldCol = 0;
+        int worldRow = 0;
 
-       while(worldCol < app.maxWorldCol && worldRow < app.maxWorldRow){
-           int tileNum = mapTileNum[worldRow][worldCol];
-           int worldX = worldCol * app.tileSize;
-           int worldY = worldRow * app.tileSize;
-           int screenX = worldX - app.player.worldX + app.player.screenX;
-           int screenY = worldY - app.player.worldY + app.player.screenY;
-           if (worldX + app.tileSize > app.player.worldX - app.player.screenX && worldX - app.tileSize < app.player.worldX + app.player.screenX && worldY + app.tileSize > app.player.worldY - app.player.screenY && worldY - app.tileSize < app.player.worldY + app.player.screenY) {
-               g2.drawImage(tiles[tileNum].image, screenX, screenY, app.tileSize, app.tileSize,null);
-           }
+        while(worldCol < app.maxWorldCol && worldRow < app.maxWorldRow){
+            int tileNum = mapTileNum[worldRow][worldCol];
+            int worldX = worldCol * app.tileSize;
+            int worldY = worldRow * app.tileSize;
+            int screenX = worldX - app.player.worldX + app.player.screenX;
+            int screenY = worldY - app.player.worldY + app.player.screenY;
+            if (worldX + app.tileSize > app.player.worldX - app.player.screenX && worldX - app.tileSize < app.player.worldX + app.player.screenX && worldY + app.tileSize > app.player.worldY - app.player.screenY && worldY - app.tileSize < app.player.worldY + app.player.screenY) {
+                g2.drawImage(tiles[tileNum].image, screenX, screenY, app.tileSize, app.tileSize,null);
+            }
 
-           worldCol++;
-
-
-           if(worldCol == app.maxWorldCol){
-               worldCol = 0;
-               worldRow++;
+            worldCol++;
 
 
-           }
+            if(worldCol == app.maxWorldCol){
+                worldCol = 0;
+                worldRow++;
 
-       }
+
+            }
+
+        }
     }
 
 }
