@@ -12,14 +12,16 @@ public class Cop extends Entity{
         solidArea.x =8;
         solidArea.y =16;
         solidArea.width =32;
-        solidArea.height =32;
-        setDeafultCopValues();
-    }
-    public void setDeafultCopValues() {
+        solidArea.height =32; worldX = app.tileSize * 24;
         worldX = app.tileSize * 24;
         worldY = app.tileSize * 18;
         speed = 7;
         direction = "up";
+        getCopImage();
+        setDeafultCopValues();
+    }
+    public void setDeafultCopValues() {
+
     }
     public void getCopImage(){
         try{
