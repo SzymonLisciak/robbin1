@@ -14,6 +14,7 @@ public class Player extends Entity {
     public final int screenY;
 
     public Player(App app, KeyHandler keyH) {
+        super(app);
         this.app = app;
         this.keyH = keyH;
         screenX = app.screenWidth/2 - (app.tileSize/2);
@@ -35,8 +36,8 @@ public class Player extends Entity {
     }
     public void getPlayerImage(){
         try{
-         left1 = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_left.png"));
-         right1 = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_right.png"));
+         this.left1 = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_left.png"));
+         this.right1 = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_right.png"));
         }
         catch(IOException e){
             e.printStackTrace();
@@ -46,27 +47,27 @@ public class Player extends Entity {
 
 
     public void update(){
-        if (keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true || keyH.rightPressed == true){
-        if(keyH.upPressed == true){
+        if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed){
+        if(keyH.upPressed){
             direction = "up";
 
         }
-        else if(keyH.downPressed == true){
+        else if(keyH.downPressed){
             direction = "down";
 
         }
-        else if(keyH.leftPressed == true){
+        else if(keyH.leftPressed){
             direction = "left";
 
         }
-        else if(keyH.rightPressed == true){
+        else if(keyH.rightPressed){
             direction = "right";
 
         }
         collisionOn = false;
         app.cChecker.checkTile(this);
 
-        if (collisionOn == false) {
+        if (!collisionOn) {
             switch (direction) {
                 case "left":
                     worldX -= speed;
@@ -91,19 +92,12 @@ public class Player extends Entity {
 
         BufferedImage image = null;
         switch(direction){
-           case "left":
+           case "left", "up":
                image = left1;
                break;
-          case "right":
+          case "right", "down":
               image = right1;
               break;
-            case "down":
-                image = right1;
-                break;
-            case "up":
-
-                image = left1;
-                break;
         }
 
         g2.drawImage(image, screenX, screenY, app.tileSize, app.tileSize, null);

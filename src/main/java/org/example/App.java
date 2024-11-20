@@ -104,6 +104,7 @@ public class App extends JPanel implements Runnable {
 
     public void update(){
     player.update();
+    cop1.updateCop();
 
     }
     public void paintComponent(Graphics g){
@@ -111,8 +112,8 @@ public class App extends JPanel implements Runnable {
 
         Graphics2D g2 = (Graphics2D) g;
         tileM.draw(g2);
-
         player.draw(g2);
+        cop1.drawCop(g2);
 
         g2.dispose();
     }
