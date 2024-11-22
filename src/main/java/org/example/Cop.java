@@ -6,10 +6,14 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class Cop extends Entity {
+        public final int screenX;
+        public final int screenY;
 
     public Cop(App app) {
         super(app);
         solidArea = new Rectangle();
+        screenX = app.screenWidth/2 - (app.tileSize/2);
+        screenY = app.screenHeight/2 - (app.tileSize/2);
         solidArea.x = 8;
         solidArea.y = 16;
         solidArea.width = 32;
@@ -48,7 +52,7 @@ public class Cop extends Entity {
                 break;
         }
 
-        g2.drawImage(image, worldX, worldY, app.tileSize, app.tileSize, null);
+        g2.drawImage(image, worldY, worldY, app.tileSize, app.tileSize, null);
     }
 
     public void updateCop() {

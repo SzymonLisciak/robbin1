@@ -14,6 +14,8 @@ public abstract class Entity {
     public Rectangle solidArea = new Rectangle(0,0,48,48);
     public int solidAreaDefaultX, solidAreaDefaultY;
     public boolean collisionOn = false;
+    public boolean slownessOn = false;
+    public boolean fastOn = false;
 
     public Entity(App app) {
         this.app = app;

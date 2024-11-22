@@ -23,6 +23,7 @@ public class App extends JPanel implements Runnable {
 
     KeyHandler keyH = new KeyHandler();
     Thread gameThread;
+    EffectChecker effectChecker = new EffectChecker(this);
     CollisionChecker cChecker = new CollisionChecker(this);
     int FPS = 60;
     TileManager tileM = new TileManager(this);

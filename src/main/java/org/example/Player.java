@@ -64,8 +64,11 @@ public class Player extends Entity {
             direction = "right";
 
         }
+        slownessOn = false;
         collisionOn = false;
+        fastOn = false;
         app.cChecker.checkTile(this);
+        app.effectChecker.checkTile(this);
 
         if (!collisionOn) {
             switch (direction) {
@@ -83,6 +86,14 @@ public class Player extends Entity {
                     break;
             }
             }
+            if (slownessOn) {
+               speed = 2;
+            }else if(fastOn) {speed = 11;
+            }else {
+                speed = 7;
+            }
+
+
         }
     }
     public void draw(Graphics2D g2){
