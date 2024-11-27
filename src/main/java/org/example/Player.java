@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 
 import java.io.IOException;
 
-public class Player extends Entity {
+public class Player extends Entity implements Transform{
     App app;
     KeyHandler keyH;
 
@@ -34,10 +34,13 @@ public class Player extends Entity {
         direction = "up";
 
     }
+
     public void getPlayerImage(){
         try{
          this.left1 = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_left.png"));
          this.right1 = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_right.png"));
+            this.leftCar = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_leftcar.png"));
+            this.rightCar = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_rightcar.png"));
         }
         catch(IOException e){
             e.printStackTrace();
@@ -116,4 +119,23 @@ public class Player extends Entity {
 
     }
 
+    @Override
+    public void EntityTransformation() {
+
+    }
+
+    @Override
+    public void EntityTransformation(Graphics2D g2) {
+        BufferedImage image = null;
+        switch(direction){
+            case "left", "up":
+                image = leftCar;
+                break;
+            case "right", "down":
+                image = right1;
+                break;
+        }
+
+        g2.drawImage(image, screenX, screenY, app.tileSize, app.tileSize, null);
+    }
 }

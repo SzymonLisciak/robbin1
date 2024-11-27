@@ -7,7 +7,7 @@ public abstract class Entity {
     App app;
     public int worldX ,worldY;
     public int speed;
-    public BufferedImage left1,right1;
+    public BufferedImage left1,right1, leftCar, rightCar;
     public String direction;
     public int spriteCounter = 0;
     public int spriteNum = 1;

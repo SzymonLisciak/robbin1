@@ -3,6 +3,7 @@ package org.example;
 public class EffectChecker  {
     private final App app;
 
+
     public EffectChecker(App app) {
         this.app = app;
     }
@@ -41,6 +42,8 @@ public class EffectChecker  {
                         }
                         else if (app.tileM.tiles[tileNum1].fast || app.tileM.tiles[tileNum2].fast) {
                             entity.fastOn = true;
+
+
                         }
                         break;
                     case "left":
@@ -52,6 +55,7 @@ public class EffectChecker  {
                         }
                         else if (app.tileM.tiles[tileNum1].fast || app.tileM.tiles[tileNum2].fast) {
                             entity.fastOn = true;
+
                         }
                         break;
                     case "right":
