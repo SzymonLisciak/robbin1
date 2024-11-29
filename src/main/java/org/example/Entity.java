@@ -3,7 +3,7 @@ package org.example;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public abstract class Entity {
+public abstract class Entity implements Transform{
     App app;
     public int worldX ,worldY;
     public int speed;
@@ -20,5 +20,6 @@ public abstract class Entity {
     public Entity(App app) {
         this.app = app;
     }
-
+    public void EntityTransformation(Graphics2D g2) {
+    }
 }

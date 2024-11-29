@@ -39,8 +39,8 @@ public class Player extends Entity implements Transform{
         try{
          this.left1 = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_left.png"));
          this.right1 = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_right.png"));
-            this.leftCar = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_leftcar.png"));
-            this.rightCar = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_rightcar.png"));
+         this.leftCar = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_leftcar.png"));
+         this.rightCar = ImageIO.read(getClass().getResourceAsStream("/zdj/nga_rightcar.png"));
         }
         catch(IOException e){
             e.printStackTrace();
@@ -91,7 +91,8 @@ public class Player extends Entity implements Transform{
             }
             if (slownessOn) {
                speed = 2;
-            }else if(fastOn) {speed = 11;
+            }else if(fastOn) {
+                speed = 11;
             }else {
                 speed = 7;
             }
@@ -113,16 +114,16 @@ public class Player extends Entity implements Transform{
               image = right1;
               break;
         }
+        if (fastOn){
+            EntityTransformation(g2);
+            return;
+        }
 
         g2.drawImage(image, screenX, screenY, app.tileSize, app.tileSize, null);
 
 
     }
 
-    @Override
-    public void EntityTransformation() {
-
-    }
 
     @Override
     public void EntityTransformation(Graphics2D g2) {
@@ -132,7 +133,7 @@ public class Player extends Entity implements Transform{
                 image = leftCar;
                 break;
             case "right", "down":
-                image = right1;
+                image = rightCar;
                 break;
         }
 

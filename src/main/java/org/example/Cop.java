@@ -52,7 +52,7 @@ public class Cop extends Entity {
                 break;
         }
 
-        g2.drawImage(image, worldY, worldY, app.tileSize, app.tileSize, null);
+        g2.drawImage(image, worldX, worldY, app.tileSize, app.tileSize, null);
     }
 
     public void updateCop() {

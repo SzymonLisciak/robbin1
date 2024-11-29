@@ -22,7 +22,7 @@ public class EffectChecker  {
 
                 switch (entity.direction) {
                     case "up":
-                        entityTopRow = (entityTopWorldY - entity.speed)/app.tileSize;
+                        entityTopRow = (entityTopWorldY)/app.tileSize;
                         tileNum1 = app.tileM.mapTileNum[entityTopRow][entityLeftCol];
                         tileNum2 = app.tileM.mapTileNum[entityTopRow][entityRightCol];
                         if (app.tileM.tiles[tileNum1].slowness || app.tileM.tiles[tileNum2].slowness) {
@@ -34,7 +34,7 @@ public class EffectChecker  {
 
                         break;
                     case "down":
-                        entityBottomRow = (entityBottomWorldY + entity.speed)/app.tileSize;
+                        entityBottomRow = (entityBottomWorldY)/app.tileSize;
                         tileNum1 = app.tileM.mapTileNum[entityBottomRow][entityLeftCol];
                         tileNum2 = app.tileM.mapTileNum[entityBottomRow][entityRightCol];
                         if (app.tileM.tiles[tileNum1].slowness || app.tileM.tiles[tileNum2].slowness) {
@@ -47,7 +47,7 @@ public class EffectChecker  {
                         }
                         break;
                     case "left":
-                        entityLeftCol = (entityLeftWorldX - entity.speed)/app.tileSize;
+                        entityLeftCol = (entityLeftWorldX)/app.tileSize;
                         tileNum1 = app.tileM.mapTileNum[entityTopRow][entityLeftCol];
                         tileNum2 = app.tileM.mapTileNum[entityBottomRow][entityLeftCol];
                         if (app.tileM.tiles[tileNum1].slowness || app.tileM.tiles[tileNum2].slowness) {
@@ -59,7 +59,7 @@ public class EffectChecker  {
                         }
                         break;
                     case "right":
-                        entityRightCol = (entityRightWorldX + entity.speed)/app.tileSize;
+                        entityRightCol = (entityRightWorldX)/app.tileSize;
                         tileNum1 = app.tileM.mapTileNum[entityTopRow][entityRightCol];
                         tileNum2 = app.tileM.mapTileNum[entityBottomRow][entityRightCol];
                         if (app.tileM.tiles[tileNum1].slowness || app.tileM.tiles[tileNum2].slowness) {
