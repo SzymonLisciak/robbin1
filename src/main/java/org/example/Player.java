@@ -28,8 +28,8 @@ public class Player extends Entity implements Transform{
         getPlayerImage();
     }
     public void setDefaultValues(){
-        worldX = app.tileSize * 24;
-        worldY = app.tileSize * 18;
+        worldX = app.tileSize * 18;
+        worldY = app.tileSize * 24;
         speed = 7;
         direction = "up";
 

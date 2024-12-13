@@ -1,34 +1,46 @@
 package org.example;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.*;
+import java.util.List;
+import javax.imageio.ImageIO;
 
-public class Cop extends Entity {
-        public final int screenX;
-        public final int screenY;
+public class Cop extends Entity implements Transform {
+    private int screenX;
+    private int screenY;
+    private List<Point> path;
+    private Point currentTarget;
+    private double preciseX;
+    private double preciseY;
 
     public Cop(App app) {
         super(app);
-        solidArea = new Rectangle();
-        screenX = app.screenWidth/2 - (app.tileSize/2);
-        screenY = app.screenHeight/2 - (app.tileSize/2);
-        solidArea.x = 8;
-        solidArea.y = 16;
-        solidArea.width = 32;
-        solidArea.height = 32;
-        worldX = app.tileSize * 24;
-        worldY = app.tileSize * 18;
-        direction = "left";
+        setRandomDefaultValues();
         getCopImage();
+        solidArea = new Rectangle(8, 16, 32, 32);
     }
 
-    public void setDeafultCopValues() {
+    private void setRandomDefaultValues() {
+        // Find a random non-solid tile to spawn
+        Random random = new Random();
+        int worldCol, worldRow, tileNum;
+        do {
+            worldCol = random.nextInt(app.maxWorldCol);
+            worldRow = random.nextInt(app.maxWorldRow);
+            tileNum = app.tileM.mapTileNum[worldRow][worldCol];
+        } while (app.tileM.tiles[tileNum].collision);
 
+        worldX = worldCol * app.tileSize;
+        worldY = worldRow * app.tileSize;
+        preciseX = worldX;
+        preciseY = worldY;
+        speed = 7;
+        direction = "right";
     }
 
-    public void getCopImage() {
+    private void getCopImage() {
         try {
             this.left1 = ImageIO.read(getClass().getResourceAsStream("/zdj/cop_left.png"));
             this.right1 = ImageIO.read(getClass().getResourceAsStream("/zdj/cop_right.png"));
@@ -37,13 +49,173 @@ public class Cop extends Entity {
         }
     }
 
+    private class Node implements Comparable<Node> {
+        int x, y;
+        int gCost, hCost;
+        Node parent;
+
+        Node(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        int getFCost() {
+            return gCost + hCost;
+        }
+
+        @Override
+        public int compareTo(Node other) {
+            return Integer.compare(this.getFCost(), other.getFCost());
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof Node) {
+                Node other = (Node) obj;
+                return this.x == other.x && this.y == other.y;
+            }
+            return false;
+        }
+    }
+
+    private List<Point> findPath(int startX, int startY, int targetX, int targetY) {
+        PriorityQueue<Node> openSet = new PriorityQueue<>();
+        Set<Node> closedSet = new HashSet<>();
+
+        Node startNode = new Node(startX, startY);
+        Node targetNode = new Node(targetX, targetY);
+
+        startNode.gCost = 0;
+        startNode.hCost = Math.abs(startX - targetX) + Math.abs(startY - targetY);
+
+        openSet.add(startNode);
+
+        while (!openSet.isEmpty()) {
+            Node currentNode = openSet.poll();
+
+            if (currentNode.equals(targetNode)) {
+                return reconstructPath(currentNode);
+            }
+
+            closedSet.add(currentNode);
+
+            int[][] directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+            for (int[] dir : directions) {
+                int newX = currentNode.x + dir[0];
+                int newY = currentNode.y + dir[1];
+
+                if (newX < 0 || newX >= app.maxWorldCol || newY < 0 || newY >= app.maxWorldRow) {
+                    continue;
+                }
+
+                int tileNum = app.tileM.mapTileNum[newY][newX];
+                if (app.tileM.tiles[tileNum].collision) {
+                    continue;
+                }
+
+                Node neighborNode = new Node(newX, newY);
+
+                if (closedSet.contains(neighborNode)) {
+                    continue;
+                }
+
+                int newMovementCostToNeighbor = currentNode.gCost + 1;
+
+                if (!openSet.contains(neighborNode) || newMovementCostToNeighbor < neighborNode.gCost) {
+                    neighborNode.gCost = newMovementCostToNeighbor;
+                    neighborNode.hCost = Math.abs(newX - targetX) + Math.abs(newY - targetY);
+                    neighborNode.parent = currentNode;
+
+                    if (!openSet.contains(neighborNode)) {
+                        openSet.add(neighborNode);
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private List<Point> reconstructPath(Node targetNode) {
+        List<Point> path = new ArrayList<>();
+        Node current = targetNode;
+
+        while (current != null) {
+            path.add(new Point(current.x, current.y));
+            current = current.parent;
+        }
+
+        Collections.reverse(path);
+        return path;
+    }
+
+    public void updateCop() {
+        int playerTileX = app.player.worldX / app.tileSize;
+        int playerTileY = app.player.worldY / app.tileSize;
+        int copTileX = (int) preciseX / app.tileSize;
+        int copTileY = (int) preciseY / app.tileSize;
+
+        // Resetuj ścieżkę co jakiś czas lub gdy nie ma aktualnej
+        if (path == null || path.isEmpty()) {
+            path = findPath(copTileX, copTileY, playerTileX, playerTileY);
+            if (path != null && path.size() > 1) {
+                currentTarget = new Point(path.get(1).x * app.tileSize, path.get(1).y * app.tileSize);
+            }
+        }
+
+        // Poruszaj się w kierunku następnego kafelka
+        if (currentTarget != null) {
+            // Oblicz kierunek ruchu
+            double dx = currentTarget.x - preciseX;
+            double dy = currentTarget.y - preciseY;
+            double distance = Math.sqrt(dx * dx + dy * dy);
+
+            // Poruszaj się tylko jeśli nie dotarł do celu
+            if (distance > speed) {
+                // Normalizacja wektora ruchu
+                double moveX = (dx / distance) * speed;
+                double moveY = (dy / distance) * speed;
+
+                preciseX += moveX;
+                preciseY += moveY;
+
+                // Aktualizacja świata i ekranu
+                worldX = (int) preciseX;
+                worldY = (int) preciseY;
+
+                // Ustal kierunek
+                if (Math.abs(moveX) > Math.abs(moveY)) {
+                    direction = moveX > 0 ? "right" : "left";
+                } else {
+                    direction = moveY > 0 ? "down" : "up";
+                }
+            } else {
+                // Dotarł do kafelka, usuń go ze ścieżki
+                worldX = currentTarget.x;
+                worldY = currentTarget.y;
+                preciseX = worldX;
+                preciseY = worldY;
+
+                if (path != null) {
+                    path.remove(0);
+                    if (!path.isEmpty()) {
+                        currentTarget = new Point(path.get(0).x * app.tileSize, path.get(0).y * app.tileSize);
+                    } else {
+                        currentTarget = null;
+                    }
+                }
+            }
+        }
+
+        // Oblicz pozycję na ekranie
+        screenX = worldX - app.player.worldX + app.player.screenX;
+        screenY = worldY - app.player.worldY + app.player.screenY;
+    }
+
+    // Reszta metod bez zmian
     public void drawCop(Graphics2D g2) {
-        //g2.setColor(Color.BLACK);
-
-        // g2.fillRect(x, y, app.titleSize, app.titleSize);
-
         BufferedImage image = null;
-        switch (direction) {
+        switch(direction) {
             case "left", "up":
                 image = left1;
                 break;
@@ -52,15 +224,20 @@ public class Cop extends Entity {
                 break;
         }
 
-        g2.drawImage(image, worldX, worldY, app.tileSize, app.tileSize, null);
+        g2.drawImage(image, screenX, screenY, app.tileSize, app.tileSize, null);
     }
 
-    public void updateCop() {
-        boolean g = false;
-        if (!g) {
-                direction = "up";
-        }
-        collisionOn = false;
-        app.cChecker.checkTile(this);
+    public Rectangle getBounds() {
+        return new Rectangle(
+                screenX + solidArea.x,
+                screenY + solidArea.y,
+                solidArea.width,
+                solidArea.height
+        );
+    }
+
+    @Override
+    public void EntityTransformation(Graphics2D g2) {
+        // Opcjonalna transformacja
     }
 }
