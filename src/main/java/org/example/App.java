@@ -2,14 +2,16 @@ package org.example;
 
 import org.example.tile.TileManager;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.*;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 public class App extends JPanel implements Runnable {
 
@@ -35,7 +37,7 @@ public class App extends JPanel implements Runnable {
     TileManager tileM = new TileManager(this);
 
     public Player player = new Player(this,keyH);
-    public List<Cop> cops = new ArrayList<>();
+    public List<Cop> cops = Collections.synchronizedList(new ArrayList<>());
     private int pursuitLevel = 1;
     private Timer pursuitTimer;
 
@@ -55,13 +57,10 @@ public class App extends JPanel implements Runnable {
         this.setFocusable(true);
         this.addKeyListener(keyH);
         this.setLayout(null);
-        startPursuitTimer();
 
-        // Inicjalizacja pierwszego policjanta
         Cop initialCop = new Cop(this);
         cops.add(initialCop);
 
-        // Inicjalizacja przycisku restartu
         restartButton = new JButton("Restart");
         restartButton.setBounds(screenWidth / 2 - 50, screenHeight / 2 + 50, 100, 50);
         restartButton.addActionListener(new ActionListener() {
@@ -73,8 +72,7 @@ public class App extends JPanel implements Runnable {
         restartButton.setVisible(false);
         this.add(restartButton);
 
-        // Uruchomienie timera pościgu
-        startPursuitTimer();
+        startPursuitTimer(); // Zostaw tylko to wywołanie
     }
     public void startGameThread(){
         gameThread = new Thread(this);
@@ -101,37 +99,31 @@ public class App extends JPanel implements Runnable {
         }, 15000, 15000); // Every 15 seconds
     }
 
-    private void increasePursuitLevel() {
-        pursuitLevel++;
-
-        // Dodaj nowego policjanta co poziom
-        Cop newCop = new Cop(this);
-        cops.add(newCop);
-
-        System.out.println("Pursuit Level: " + pursuitLevel);
+    private synchronized void increasePursuitLevel() {
+        if (gameState == GameState.PLAYING) {
+            pursuitLevel++;
+            Cop newCop = new Cop(this);
+            synchronized (cops) {
+                cops.add(newCop);
+            }
+            System.out.println("Pursuit Level: " + pursuitLevel);
+        }
     }
 
     private void restartGame() {
-        // Modify restart to handle all game states
         gameState = GameState.PLAYING;
 
-        // Resetowanie pozycji gracza
         player = new Player(this, keyH);
 
-        // Wyczyszczenie listy policjantów i dodanie początkowego
         cops.clear();
         cops.add(new Cop(this));
 
-        // Resetowanie poziomu pościgu
         pursuitLevel = 1;
 
-        // Ukrycie przycisku restartu
         restartButton.setVisible(false);
 
-        // Ponowne uruchomienie timera pościgu
         startPursuitTimer();
 
-        // Przywrócenie fokusa na panel gry
         this.requestFocusInWindow();
     }
     @Override
@@ -169,11 +161,16 @@ public class App extends JPanel implements Runnable {
         if (gameState == GameState.PLAYING) {
             player.update();
 
-            // Aktualizacja wszystkich policjantów
-            for (Cop cop : cops) {
+            // Synchronizowana kopia listy
+            List<Cop> copsCopy;
+            synchronized (cops) {
+                copsCopy = new ArrayList<>(cops);
+            }
+
+            for (Cop cop : copsCopy) {
                 cop.updateCop();
 
-                // Sprawdzanie kolizji z każdym policjantem
+                // kolizja z policjantem
                 Rectangle playerBounds = new Rectangle(
                         player.worldX + player.solidArea.x,
                         player.worldY + player.solidArea.y,
@@ -190,7 +187,7 @@ public class App extends JPanel implements Runnable {
 
                 if (playerBounds.intersects(copBounds)) {
                     gameState = GameState.GAME_OVER;
-                    // Zatrzymanie timera przy game over
+                    // zarzymanie timera przy komncu gry
                     if (pursuitTimer != null) {
                         pursuitTimer.cancel();
                     }
@@ -205,16 +202,15 @@ public class App extends JPanel implements Runnable {
 
         Graphics2D g2 = (Graphics2D) g;
 
-        // Rysowanie gry
         tileM.draw(g2);
         player.draw(g2);
 
-        // Rysowanie wszystkich policjantów
         for (Cop cop : cops) {
             cop.drawCop(g2);
         }
 
-        // Ekran Game Over
+        drawPursuitLevelStars(g2);
+
         if (gameState == GameState.GAME_OVER) {
             drawGameOver(g2);
             SwingUtilities.invokeLater(() -> {
@@ -228,7 +224,6 @@ public class App extends JPanel implements Runnable {
             });
         }
 
-        // Ekran Game Won
         if (gameState == GameState.GAME_WON) {
             drawGameWon(g2);
             SwingUtilities.invokeLater(() -> {
@@ -244,12 +239,28 @@ public class App extends JPanel implements Runnable {
 
         g2.dispose();
     }
+    private void drawPursuitLevelStars(Graphics2D g2) {
+        BufferedImage starImage = null;
+        try {
+            starImage = ImageIO.read(getClass().getResourceAsStream("/zdj/star.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        int starSize = 16; // Rozmiar gwiazdki
+        int padding = 10;  // Odległość między gwiazdkami
+
+        for (int i = 0; i < pursuitLevel; i++) {
+            int x = padding + (starSize + padding) * i;
+            int y = padding;
+            g2.drawImage(starImage, x, y, starSize, starSize, null);
+        }
+    }
     private void drawGameWon(Graphics2D g2) {
-        // Zaciemnienie ekranu
         g2.setColor(new Color(0, 0, 0, 180));
         g2.fillRect(0, 0, screenWidth, screenHeight);
 
-        // Tekst Game Won
         g2.setColor(Color.GREEN);
         g2.setFont(new Font("Arial", Font.BOLD, 50));
         String text = "YOU WON!";
@@ -259,11 +270,9 @@ public class App extends JPanel implements Runnable {
 
 
     private void drawGameOver(Graphics2D g2) {
-        // Zaciemnienie ekranu
         g2.setColor(new Color(0, 0, 0, 180));
         g2.fillRect(0, 0, screenWidth, screenHeight);
 
-        // Tekst Game Over
         g2.setColor(Color.RED);
         g2.setFont(new Font("Arial", Font.BOLD, 50));
         String text = "GAME OVER";
@@ -271,7 +280,6 @@ public class App extends JPanel implements Runnable {
         g2.drawString(text, screenWidth/2 - textWidth/2, screenHeight/2);
     }
 
-    // Dodaj metodę czyszczącą zasoby przy zamykaniu gry
     public void cleanup() {
         if (pursuitTimer != null) {
             pursuitTimer.cancel();

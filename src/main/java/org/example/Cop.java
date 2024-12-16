@@ -23,7 +23,6 @@ public class Cop extends Entity implements Transform {
     }
 
     private void setRandomDefaultValues() {
-        // Find a random non-solid tile to spawn
         Random random = new Random();
         int worldCol, worldRow, tileNum;
         do {
@@ -36,7 +35,7 @@ public class Cop extends Entity implements Transform {
         worldY = worldRow * app.tileSize;
         preciseX = worldX;
         preciseY = worldY;
-        speed = 7;
+        speed = 3;
         direction = "right";
     }
 
@@ -155,7 +154,6 @@ public class Cop extends Entity implements Transform {
         int copTileX = (int) preciseX / app.tileSize;
         int copTileY = (int) preciseY / app.tileSize;
 
-        // Resetuj ścieżkę co jakiś czas lub gdy nie ma aktualnej
         if (path == null || path.isEmpty()) {
             path = findPath(copTileX, copTileY, playerTileX, playerTileY);
             if (path != null && path.size() > 1) {
@@ -163,34 +161,27 @@ public class Cop extends Entity implements Transform {
             }
         }
 
-        // Poruszaj się w kierunku następnego kafelka
         if (currentTarget != null) {
-            // Oblicz kierunek ruchu
             double dx = currentTarget.x - preciseX;
             double dy = currentTarget.y - preciseY;
             double distance = Math.sqrt(dx * dx + dy * dy);
 
-            // Poruszaj się tylko jeśli nie dotarł do celu
             if (distance > speed) {
-                // Normalizacja wektora ruchu
                 double moveX = (dx / distance) * speed;
                 double moveY = (dy / distance) * speed;
 
                 preciseX += moveX;
                 preciseY += moveY;
 
-                // Aktualizacja świata i ekranu
                 worldX = (int) preciseX;
                 worldY = (int) preciseY;
 
-                // Ustal kierunek
                 if (Math.abs(moveX) > Math.abs(moveY)) {
                     direction = moveX > 0 ? "right" : "left";
                 } else {
                     direction = moveY > 0 ? "down" : "up";
                 }
             } else {
-                // Dotarł do kafelka, usuń go ze ścieżki
                 worldX = currentTarget.x;
                 worldY = currentTarget.y;
                 preciseX = worldX;
@@ -207,12 +198,11 @@ public class Cop extends Entity implements Transform {
             }
         }
 
-        // Oblicz pozycję na ekranie
+        //pozycja
         screenX = worldX - app.player.worldX + app.player.screenX;
         screenY = worldY - app.player.worldY + app.player.screenY;
     }
 
-    // Reszta metod bez zmian
     public void drawCop(Graphics2D g2) {
         BufferedImage image = null;
         switch(direction) {
